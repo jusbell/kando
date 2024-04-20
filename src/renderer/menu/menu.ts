@@ -10,9 +10,10 @@
 
 import { EventEmitter } from 'events';
 
-import * as math from '../math';
+import DOMPurify from 'dompurify';
 import { IVec2 } from '../../common';
 import { IRenderedMenuItem } from './rendered-menu-item';
+import * as math from '../math';
 import { CenterText } from './center-text';
 import { GestureDetection } from './gesture-detection';
 import { InputState, InputTracker } from './input-tracker';
@@ -273,23 +274,13 @@ export class Menu extends EventEmitter {
     const menuItem = document.createElement('div');
     menuItem.classList.add('menu-item');
 
-    const icon = document.createElement('i');
-    icon.classList.add('menu-icon');
-
-    if (item.iconTheme === 'material-symbols-rounded') {
-      icon.classList.add('material-symbols-rounded');
-      icon.innerHTML = item.icon;
-    } else if (item.iconTheme === 'emoji') {
-      icon.classList.add('emoji-icon');
-      icon.innerHTML = item.icon;
-    } else if (item.iconTheme === 'simple-icons') {
-      icon.classList.add('si');
-      icon.classList.add('si-' + item.icon);
-    }
-
     container.appendChild(item.nodeDiv);
     item.nodeDiv.appendChild(menuItem);
-    menuItem.appendChild(icon);
+
+    // TODO: Use text instead of icon if icon does not exist.
+    if (item.icon) {
+      menuItem.appendChild(this.createIcon(item));
+    }
 
     if (item.children) {
       item.connectorDiv = document.createElement('div');
@@ -306,6 +297,30 @@ export class Menu extends EventEmitter {
       const padding = this.CENTER_RADIUS * 0.1;
       this.centerText = new CenterText(item.nodeDiv, maxCenterTextSize - padding);
     }
+  }
+
+  private createIcon(item: IRenderedMenuItem): HTMLElement {
+    const icon = document.createElement('i');
+    icon.classList.add('menu-icon');
+
+    if (item.iconTheme === 'material-symbols-rounded') {
+      icon.classList.add('material-symbols-rounded');
+      icon.innerHTML = item.icon;
+    } else if (item.iconTheme === 'emoji') {
+      icon.classList.add('emoji-icon');
+      icon.innerHTML = item.icon;
+    } else if (item.iconTheme === 'simple-icons') {
+      icon.classList.add('si');
+      icon.classList.add('si-' + item.icon);
+    } else if (item.icon.startsWith('<svg')) {
+      const svg = new DOMParser().parseFromString(
+        DOMPurify.sanitize(item.icon),
+        'image/svg+xml'
+      );
+      icon.appendChild(svg.documentElement);
+    }
+
+    return icon;
   }
 
   /**
