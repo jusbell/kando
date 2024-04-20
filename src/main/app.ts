@@ -15,7 +15,7 @@ import { exec } from 'child_process';
 import { Notification } from 'electron';
 
 import { Backend, getBackend } from './backends';
-import { IMenuItem, IMenu, IMenuSettings, IAppSettings } from '../common';
+import { IMenuItem, IMenu, IMenuSettings, IAppSettings, CLIOptions } from '../common';
 import { Settings, DeepReadonly } from './settings';
 import { ActionRegistry } from '../common/action-registry';
 
@@ -62,7 +62,7 @@ export class KandoApp {
    * in the user's home directory.
    */
   private appSettings = new Settings<IAppSettings>({
-    file: 'config.json',
+    file: this.options.config ?? 'config.json',
     directory: app.getPath('userData'),
     defaults: {
       menuTheme: 'none',
@@ -76,13 +76,15 @@ export class KandoApp {
    * home directory.
    */
   private menuSettings = new Settings<IMenuSettings>({
-    file: 'menus.json',
+    file: this.options.menu ?? 'menus.json',
     directory: app.getPath('userData'),
     defaults: {
       menus: [this.createExampleMenu()],
       stash: [],
     },
   });
+
+  constructor(private readonly options: CLIOptions) {}
 
   /** This is called when the app is started. It initializes the backend and the window. */
   public async init() {

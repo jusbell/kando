@@ -10,19 +10,13 @@
 
 import { app } from 'electron';
 import { program } from 'commander';
+import { CLIOptions } from './common';
 
 /**
  * This file is the main entry point for Kando's host process. It is responsible for
  * handling the lifecycle of the app. The drawing of the menu and the editor is done in
  * the renderer process (see renderer.ts).
  */
-
-/** This interface is used to pass command line arguments to the app. */
-interface CLIOptions {
-  // This optional parameter is specified using the --menu option. It is used to show a
-  // menu when the app or a second instance of the app is started.
-  menu?: string;
-}
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -35,7 +29,9 @@ program
   .name('kando')
   .description('The cross-platform pie menu.')
   .version(app.getVersion())
-  .option('-m, --menu <menu>', 'show the menu with the given name');
+  .option('-m, --menu <menu>', 'show the menu with the given name')
+  .option('-c, --config <config>', 'menu configuration')
+  .allowUnknownOption(true);
 
 program.parse();
 const options = program.opts() as CLIOptions;
@@ -65,7 +61,7 @@ app.setPath('crashDumps', path.join(app.getPath('sessionData'), 'crashDumps'));
 app.setAppLogsPath(path.join(app.getPath('sessionData'), 'logs'));
 
 // Create the app and initialize it as soon as electron is ready.
-const kando = new KandoApp();
+const kando = new KandoApp(options);
 
 app
   .whenReady()

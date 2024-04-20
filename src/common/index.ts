@@ -8,6 +8,16 @@
 // SPDX-FileCopyrightText: Simon Schneegans <code@simonschneegans.de>
 // SPDX-License-Identifier: MIT
 
+/** This interface is used to pass command line arguments to the app. */
+export interface CLIOptions {
+  // This optional parameter is specified using the --menu option. It is used to show a
+  // menu when the app or a second instance of the app is started.
+  menu?: string;
+  // This optional parameter is specified using the --config option.
+  // It is used to set the config for the app.
+  config?: string;
+}
+
 /**
  * A simple 2D vector.
  *
