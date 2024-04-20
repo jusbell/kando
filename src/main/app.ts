@@ -329,40 +329,28 @@ export class KandoApp {
       try {
         // Find the selected item.
         const item = this.getMenuItemAtPath(this.lastMenu.nodes, path);
+        console.log('Select item: ' + path);
 
+        const hideWindowPromise = this.hideWindow();
         // If the action is not delayed, we execute it immediately.
         const executeDelayed = ActionRegistry.getInstance().delayedExecution(item);
         if (!executeDelayed) {
           ActionRegistry.getInstance().execute(item, this.backend);
-        }
-
-        // Also wait with the execution of the selected action until the fade-out
-        // animation is finished to make sure that any resulting events (such as virtual
-        // key presses) are not captured by the window.
-        this.hideTimeout = setTimeout(() => {
-          console.log('Select item: ' + path);
-
-          this.hideWindow();
-          this.hideTimeout = null;
-
-          // If the action is delayed, we execute it after the window is hidden.
-          if (executeDelayed) {
+        } else {
+          hideWindowPromise.then(() => {
             ActionRegistry.getInstance().execute(item, this.backend);
-          }
-        }, 400);
+          });
+        }
       } catch (err) {
         console.error('Failed to select item: ' + err);
+        this.hideWindow();
       }
     });
 
     // We do not hide the window immediately when the user aborts a selection. Instead, we
     // wait for the fade-out animation to finish.
     ipcMain.on('cancel-selection', () => {
-      this.hideTimeout = setTimeout(() => {
-        console.log('Cancel selection.');
-        this.hideWindow();
-        this.hideTimeout = null;
-      }, 300);
+      this.hideWindow();
     });
 
     // The callbacks below are only used for the example actions. They will be removed
@@ -526,15 +514,22 @@ export class KandoApp {
    *
    * See also: https://stackoverflow.com/questions/50642126/previous-window-focus-electron
    */
-  private hideWindow() {
-    if (process.platform === 'win32') {
-      this.window.setIgnoreMouseEvents(true);
-      this.window.minimize();
-    } else if (process.platform === 'darwin') {
-      app.hide();
-    } else {
-      this.window.hide();
-    }
+  private async hideWindow(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      this.hideTimeout = setTimeout(() => {
+        if (process.platform === 'win32') {
+          this.window.setIgnoreMouseEvents(true);
+          this.window.minimize();
+        } else if (process.platform === 'darwin') {
+          app.hide();
+        } else {
+          this.window.hide();
+        }
+        resolve();
+      }, 400);
+    }).then(() => {
+      this.hideTimeout = null;
+    });
   }
 
   /** This creates an example menu which can be used for testing. */
