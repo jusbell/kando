@@ -52,6 +52,7 @@ if (!gotTheLock) {
 import { KandoApp } from './main/app';
 import { Notification } from 'electron';
 import path from 'path';
+import { CLIOptions } from './common';
 
 // It is not very nice that electron stores all its cache data in the user's config
 // directory. Until https://github.com/electron/electron/pull/34337 is merged, we

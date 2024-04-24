@@ -15,7 +15,7 @@ import { exec } from 'child_process';
 import { Notification } from 'electron';
 
 import { Backend, getBackend } from './backends';
-import { IMenuItem, IMenu, IMenuSettings, IAppSettings, CLIOptions } from '../common';
+import { IMenu, IMenuSettings, IAppSettings, CLIOptions } from '../common';
 import { Settings, DeepReadonly } from './settings';
 import { ActionRegistry } from '../common/action-registry';
 
