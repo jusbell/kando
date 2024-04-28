@@ -9,13 +9,23 @@
 // SPDX-License-Identifier: MIT
 
 import os from 'node:os';
-import { screen, BrowserWindow, ipcMain, shell, Tray, Menu, app } from 'electron';
+import {
+  screen,
+  BrowserWindow,
+  ipcMain,
+  shell,
+  Tray,
+  Menu,
+  app,
+  protocol,
+  net,
+} from 'electron';
 import path from 'path';
 import { exec } from 'child_process';
 import { Notification } from 'electron';
 
 import { Backend, getBackend } from './backends';
-import { IMenu, IMenuSettings, IAppSettings, CLIOptions } from '../common';
+import { IMenu, IMenuSettings, IAppSettings, CLIOptions, IMenuItem } from '../common';
 import { Settings, DeepReadonly } from './settings';
 import { ActionRegistry } from '../common/action-registry';
 
@@ -94,6 +104,10 @@ export class KandoApp {
     }
 
     await this.backend.init();
+
+    protocol.handle('kando-icon', (request) =>
+      net.fetch('file://' + request.url.slice('kando-icon://'.length))
+    );
 
     // We ensure that there is always a menu avaliable. If the user deletes all menus,
     // we create a new example menu when Kando is started the next time.

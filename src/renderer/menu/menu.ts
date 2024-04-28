@@ -318,6 +318,10 @@ export class Menu extends EventEmitter {
         'image/svg+xml'
       );
       icon.appendChild(svg.documentElement);
+    } else if (/.*?\.(gif|jpg|jpeg|tiff|png)$/i.test(item.icon)) {
+      const img = document.createElement('img');
+      img.src = `kando-icon://${item.icon}`;
+      icon.appendChild(img);
     }
 
     return icon;

@@ -68,6 +68,11 @@
         justify-content: center;
         font-size: calc($grandchild-size * 0.75);
       }
+
+      img {
+        width: 42px;
+        height: 42px;
+      }
     }
 
     // The active menu node is currently displayed in the center of the menu.
