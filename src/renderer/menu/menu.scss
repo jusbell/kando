@@ -50,6 +50,11 @@
       transition: $menu-transition;
       border: 1px solid $border-color;
 
+      // Horizontally and vertically center the node name.
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
       .menu-icon {
         transition: $menu-transition;
 
@@ -200,9 +205,20 @@
 
   // Center Text -------------------------------------------------------------------------
 
+  .center-text-container {
+    position: absolute;
+    top: calc(-1 * $root-size / 2);
+    left: calc(-1 * $root-size / 2);
+    width: $root-size;
+    height: $root-size;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   // The text in the center of the menu is wrapped in a square div with a 10% padding.
   .center-text {
-    position: absolute;
     color: $text-color;
     transition: $text-opacity-transition;
     z-index: 3;
